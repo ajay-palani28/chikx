@@ -15,7 +15,6 @@ class ApiMethods {
       payload: payload,
       showIndicator: true,
     );
-    print('Response: ${response.data}');
     handleResponseCall(response, successBlock, failureBlock);
     return response;
   }
@@ -31,7 +30,6 @@ class ApiMethods {
       payload: payload,
       showIndicator: true,
     );
-    print('Login: ${response.data}');
     handleResponseCall(response, successBlock, failureBlock);
     return response;
   }
@@ -48,7 +46,6 @@ class ApiMethods {
       showIndicator: true,
       isWithToken: true
     );
-    print('Food: ${response.data}');
     handleResponseCall(response, successBlock, failureBlock);
     return response;
   }
@@ -66,7 +63,6 @@ class ApiMethods {
       showIndicator: true,
       isWithToken: true
     );
-    print('Update Food: ${response.data}');
     handleResponseCall(response, successBlock, failureBlock);
     return response;
   }
@@ -82,7 +78,6 @@ class ApiMethods {
       showIndicator: true,
       isWithToken: true
     );
-    print('Delete Food: ${response.data}');
     handleResponseCall(response, successBlock, failureBlock);
     return response;
   }
@@ -97,7 +92,6 @@ class ApiMethods {
       showIndicator: true,
       isWithToken: true,
     );
-    print('Admin Users: ${response.data}');
     handleResponseCall(response, successBlock, failureBlock);
     return response;
   }
@@ -113,7 +107,6 @@ class ApiMethods {
       showIndicator: true,
       isWithToken: true,
     );
-    print('Admin Delete User: ${response.data}');
     handleResponseCall(response, successBlock, failureBlock);
     return response;
   }
@@ -138,7 +131,20 @@ class ApiMethods {
       showIndicator: false,
       isWithToken: true
     );
-    print('Food: ${response.data}');
+    handleResponseCall(response, successBlock, failureBlock);
+    return response;
+  }
+
+  Future getAppVersion({
+    required SuccessBlock successBlock,
+    required FailureBlock failureBlock,
+  }) async {
+    var response = await ApiEngine().performRequest(
+      ApiRequestType.GET,
+      '${ApiManager().appVersion}',
+      showIndicator: false,
+      isWithToken: false,
+    );
     handleResponseCall(response, successBlock, failureBlock);
     return response;
   }
@@ -154,7 +160,6 @@ class ApiMethods {
         showIndicator: false,
         isWithToken: true
     );
-    print('Profile: ${response.data}');
     handleResponseCall(response, successBlock, failureBlock);
     return response;
   }
@@ -172,7 +177,6 @@ class ApiMethods {
         showIndicator: false,
         isWithToken: true
     );
-    print('Profile Upload: ${response.data}');
     handleResponseCall(response, successBlock, failureBlock);
     return response;
   }
@@ -357,7 +361,6 @@ class ApiMethods {
       showIndicator: true,
       isWithToken: true,
     );
-    print('Get Deals: ${response.data}');
     handleResponseCall(response, successBlock, failureBlock);
     return response;
   }
@@ -375,7 +378,6 @@ class ApiMethods {
       showIndicator: true,
       isWithToken: true,
     );
-    print('Upsert Deal: ${response.data}');
     handleResponseCall(response, successBlock, failureBlock);
     return response;
   }
@@ -391,7 +393,6 @@ class ApiMethods {
       showIndicator: true,
       isWithToken: true,
     );
-    print('Delete Deal: ${response.data}');
     handleResponseCall(response, successBlock, failureBlock);
     return response;
   }
@@ -413,12 +414,15 @@ class ApiMethods {
 
 class ApiManager {
   static const baseUrl = 'https://chikx-worker.kattukadha3.workers.dev/api';
+  // static const baseUrl = 'http://10.0.2.2:8787/api';
   String create_account = '$baseUrl/register';
   String login = '$baseUrl/validate-user';
   String addFood = '$baseUrl/adminAddFood';
   String adminGetFood = '$baseUrl/adminGetFood';
   String adminUpdateFood = '$baseUrl/adminUpdateFood';
   String adminDeleteFood = '$baseUrl/adminDeleteFood/';
+
+  String appVersion = '$baseUrl/app/version';
 
   String adminUsers = '$baseUrl/admin/users';
   String adminDeleteUser = '$baseUrl/admin/users';

@@ -407,7 +407,10 @@ class CommonUI {
 
   Future<void> references() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.clear();
+    // Only remove auth-related data, keep remembered credentials
+    prefs.remove('token');
+    prefs.remove('userId');
+    prefs.remove('isAdmin');
   }
 
   Widget menuGridShimmer() {

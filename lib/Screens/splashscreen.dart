@@ -5,18 +5,20 @@ import 'package:chikx/Utils/app_assets.dart';
 import 'package:chikx/Utils/app_colors.dart';
 import 'package:chikx/Utils/commonui.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
+import '../RiverPod/app_config_pod.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends ConsumerState<SplashScreen> {
   // Animation states for interactive feel
   double _horizontalOffset = 0.0;
   double _scale = 1.2;
@@ -30,13 +32,16 @@ class _SplashScreenState extends State<SplashScreen> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     token = prefs.getString('token');
 
-    isAdmin=prefs.getBool('isAdmin')!;
+    isAdmin=prefs.getBool('isAdmin') ?? false;
   }
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getToken();
+    // Check app status (version/maintenance)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(appConfigProvider.notifier).checkAppStatus(context);
+    });
   }
 
   @override
@@ -106,7 +111,6 @@ class _SplashScreenState extends State<SplashScreen> {
                       // Bottom Button
                       CommonUI.buildButton(
                         onPressed: () {
-                          print('IsAdmin: ${isAdmin}');
                           if (token != null) {
                             if(isAdmin==true){
                               Navigator.pushReplacement(

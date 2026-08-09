@@ -31,6 +31,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
 
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
   void _validateAndSubmit() {
     if (_formKey.currentState!.validate()) {
       ref.read(forgotPasswordProvider.notifier).verifyAnswersAndReset(
@@ -178,9 +181,21 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   fillColor: Colors.white,
                   borderColor: AppColors.fieldBorder,
                   borderRadius: 12,
-                  obsecuretext: true,
+                  obsecuretext: _obscurePassword,
                   contentsize: 18,
                   icons: const Icon(Icons.lock_outline, color: Colors.black45),
+                  suffix: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                    child: Icon(
+                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.black45,
+                      size: 20,
+                    ),
+                  ),
                   validator: (val) {
                     if (val == null || val.isEmpty) {
                       return "Password is required";
@@ -209,9 +224,21 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   fillColor: Colors.white,
                   borderColor: AppColors.fieldBorder,
                   borderRadius: 12,
-                  obsecuretext: true,
+                  obsecuretext: _obscureConfirmPassword,
                   contentsize: 18,
                   icons: const Icon(Icons.lock_reset, color: Colors.black45),
+                  suffix: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _obscureConfirmPassword = !_obscureConfirmPassword;
+                      });
+                    },
+                    child: Icon(
+                      _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.black45,
+                      size: 20,
+                    ),
+                  ),
                   validator: (val) {
                     if (val == null || val.isEmpty) {
                       return "Please confirm your password";

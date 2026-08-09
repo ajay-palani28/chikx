@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Screens/Login/login.dart';
 import '../Utils/app_alerController.dart';
 import '../Utils/appdata_helper.dart';
 
@@ -88,7 +89,6 @@ class ApiEngine {
           var response;
           if(payload != null){
             body = jsonEncode(payload);
-            print('Request Body: $body');
             response= await HTTP.post(actualUrl, headers: headers, body: body);
           }
           else{
@@ -121,8 +121,6 @@ class ApiEngine {
 
   ApiResponse handleResponse(HTTP.Response response){
     AppAlertController().hideProgressIndicator();
-    print('Response Status Code: ${response.statusCode}');
-    print('Response Body: ${response.body}');
     
     dynamic data;
     try {
@@ -156,6 +154,13 @@ class ApiEngine {
         var apiResponse= ApiResponse(status, data);
         return apiResponse;
 
+      case 401:
+        var status = ApiResponseStatus.FAILED;
+        _handleUnauthorized();
+        var exception = Exception(getMessage(data).isNotEmpty ? getMessage(data) : 'Session expired. Please login again.');
+        var apiResponse = ApiResponse(status, data, exception: exception);
+        return apiResponse;
+
       case 502:
       case 504:
         var status= ApiResponseStatus.FAILED;
@@ -182,6 +187,24 @@ class ApiEngine {
         var exception= Exception(message.isNotEmpty ? message : 'An error occurred');
         var apiResponse= ApiResponse(status, data, exception: exception);
         return apiResponse;
+    }
+  }
+
+  void _handleUnauthorized() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('token');
+    prefs.remove('userId');
+    prefs.remove('isAdmin');
+
+    final navContext = AppDataHelper.navKey.currentContext;
+    if (navContext != null) {
+      Future.delayed(Duration.zero, () {
+        Navigator.pushAndRemoveUntil(
+          navContext,
+          MaterialPageRoute(builder: (context) => const Login()),
+          (route) => false,
+        );
+      });
     }
   }
 }

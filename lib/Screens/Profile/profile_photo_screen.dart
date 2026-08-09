@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../Provider/providers.dart';
+
 class ProfilePhotoScreen extends ConsumerWidget {
   final GetProfileModel profile;
   final VoidCallback onUpdate;
@@ -16,6 +18,16 @@ class ProfilePhotoScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Watch for profile updates to keep this screen reactive
+    final profileState = ref.watch(getProfileProvider);
+    GetProfileModel currentProfile = profile;
+    
+    if (profileState is GetProfileSuccessSate) {
+      currentProfile = GetProfileModel.fromJson(profileState.data['data']);
+    } else if (profileState is UploadProfileSuccessSate) {
+      currentProfile = GetProfileModel.fromJson(profileState.data['data']);
+    }
+
     return SafeArea(
       top: false,
       bottom: true,
@@ -54,7 +66,7 @@ class ProfilePhotoScreen extends ConsumerWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(25),
-                  child: _buildImageWidget(profile.profileImage),
+                  child: _buildImageWidget(currentProfile.profileImage),
                 ),
               ),
             ),
@@ -68,7 +80,7 @@ class ProfilePhotoScreen extends ConsumerWidget {
             ),
             Gap(0.5.h),
             CommonUI().myText(
-              text: "Updated 2 days ago",
+              text: "Current Active Profile Image",
               fontSize: 10.sp,
               fontWeight: FontWeight.w600,
               color: Colors.black26,
@@ -109,61 +121,31 @@ class ProfilePhotoScreen extends ConsumerWidget {
                     ),
                   ),
                   Gap(2.h),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {},
-                          child: Container(
-                            height: 6.h,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE5E7EB),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.share_outlined, size: 20, color: Colors.black54),
-                                Gap(2.w),
-                                CommonUI().myText(
-                                  text: "Share",
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.black54,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                  GestureDetector(
+                    onTap: () {
+                      // Implementation for share if needed
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 6.h,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE5E7EB),
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                      Gap(4.w),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {},
-                          child: Container(
-                            height: 6.h,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(color: Colors.red.withOpacity(0.2)),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.delete_outline, size: 20, color: Colors.red),
-                                Gap(2.w),
-                                CommonUI().myText(
-                                  text: "Delete",
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.red,
-                                ),
-                              ],
-                            ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.share_outlined, size: 20, color: Colors.black54),
+                          Gap(2.w),
+                          CommonUI().myText(
+                            text: "Share",
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.black54,
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                   Gap(2.h),
                 ],
@@ -176,7 +158,7 @@ class ProfilePhotoScreen extends ConsumerWidget {
   }
 
   Widget _buildImageWidget(dynamic profileImage) {
-    if (profileImage == null || profileImage == "") {
+    if (profileImage == null || profileImage == "") { 
       return Container(
         color: const Color(0xFFFAF3E7),
         child: const Icon(Icons.person, size: 100, color: AppColors.textBrown),

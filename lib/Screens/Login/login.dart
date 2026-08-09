@@ -28,16 +28,41 @@ class _LoginState extends ConsumerState<Login> {
   bool _rememberMe = false;
   bool _obscurePassword = true;
 
+  @override
+  void initState() {
+    super.initState();
+    _loadRememberedCredentials();
+  }
+
+  void _loadRememberedCredentials() async {
+    bool remember = await getRememberMe();
+    if (remember) {
+      String? phone = await getRememberedPhone();
+      String? password = await getRememberedPassword();
+      setState(() {
+        _rememberMe = true;
+        if (phone != null) _emailController.text = phone;
+        if (password != null) _passwordController.text = password;
+      });
+    }
+  }
+
   final Color brownTextColor = const Color(0xFF745223);
   final Color fieldBorderColor = const Color(0xFFE2D6C5);
 
   void _validateAndSubmit(WidgetRef ref) {
     if (_formKey.currentState!.validate()) {
+      if (_rememberMe) {
+        setRememberMe(true);
+        setRememberedPhone(_emailController.text.trim());
+        setRememberedPassword(_passwordController.text);
+      } else {
+        clearRememberedCredentials();
+      }
       var payload = LoginModel(
         phone: _emailController.text.trim(),
         password: _passwordController.text,
       );
-      print('Payload: ${payload.toJson()}');
       ref.read(loginProvider.notifier).loginUser(payload, context);
     }
   }
@@ -47,7 +72,6 @@ class _LoginState extends ConsumerState<Login> {
     ref.listen(loginProvider, (previous, next) {
       if(next is LoginSuccessSate){
         var state = next.data['data'];
-        print('Previous: ${state['admin']}, ${next.data}');
         setToken(state['token']);
         setUserId(state['id']);
         setIsAdmin(state['admin']);

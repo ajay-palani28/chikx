@@ -33,18 +33,27 @@ class _CreateAccountState extends State<CreateAccount> {
   String? _selectedQuestion1;
   String? _selectedQuestion2;
 
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
   final List<String> _questions1 = [
-    "What was your childhood nickname?",
-    "What is the name of your favorite childhood friend?",
-    "In what city or town did your mother and father meet?",
-    "What is your favorite book?",
+    "What is your favourite food?",
+    "What is your favourite food type? (e.g. Italian, Indian)",
+    "What was your favourite meal as a child?",
+    "What is your favourite fruit?",
+    "What is your favourite dessert?",
+    "What is the one food you could eat every day?",
+    "What is your favorite street food?",
   ];
 
   final List<String> _questions2 = [
-    "What was the name of your first stuffed animal?",
-    "What was the name of your elementary school?",
-    "What is the name of the company where you had your first job?",
-    "What was the model of your first car?",
+    "What was the first dish you learned to cook?",
+    "What is your go-to comfort food?",
+    "What is your favourite snack?",
+    "What is your favourite beverage?",
+    "What is your favourite breakfast dish?",
+    "What is your favorite pizza topping?",
+    "What is your favorite spice or herb?",
   ];
 
   String? selectedDob;
@@ -87,7 +96,6 @@ class _CreateAccountState extends State<CreateAccount> {
         securityQuestion2: _selectedQuestion2!,
         securityAnswer2: _securityAnswer2Controller.text.trim(),
       );
-      print('Payload: ${payload.toJson()}');
       ref.read(createAccountProvider.notifier).createAccount(payload, context);
     }
   }
@@ -294,11 +302,23 @@ class _CreateAccountState extends State<CreateAccount> {
                           fillColor: Colors.white,
                           borderColor: AppColors.fieldBorder,
                           borderRadius: 10,
-                          obsecuretext: true,
+                          obsecuretext: _obscurePassword,
                           icons: Icon(
                             Icons.lock_outline,
                             color: AppColors.textGrey,
                             size: 20,
+                          ),
+                          suffix: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                            child: Icon(
+                              _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                              color: AppColors.textGrey,
+                              size: 20,
+                            ),
                           ),
                           contentsize: 14,
                           validator: (val) {
@@ -320,11 +340,23 @@ class _CreateAccountState extends State<CreateAccount> {
                           fillColor: Colors.white,
                           borderColor: AppColors.fieldBorder,
                           borderRadius: 10,
-                          obsecuretext: true,
+                          obsecuretext: _obscureConfirmPassword,
                           icons: Icon(
                             Icons.lock_reset,
                             color: AppColors.textGrey,
                             size: 20,
+                          ),
+                          suffix: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _obscureConfirmPassword = !_obscureConfirmPassword;
+                              });
+                            },
+                            child: Icon(
+                              _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                              color: AppColors.textGrey,
+                              size: 20,
+                            ),
                           ),
                           contentsize: 14,
                           validator: (val) {
@@ -340,36 +372,16 @@ class _CreateAccountState extends State<CreateAccount> {
                         Gap(2.h),
 
                         _buildFieldLabel("Security Question 1"),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 3.w),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: AppColors.fieldBorder),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              isExpanded: true,
-                              hint: CommonUI().myText(text: "Select Question 1", fontSize: 14.sp, color: AppColors.textGrey),
-                              value: _selectedQuestion1,
-                              items: _questions1.map((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                              onChanged: (newValue) {
-                                setState(() {
-                                  _selectedQuestion1 = newValue;
-                                });
-                              },
-                            ),
-                          ),
+                        _buildSecurityDropdown(
+                          hint: "Select Food Question 1",
+                          value: _selectedQuestion1,
+                          items: _questions1,
+                          onChanged: (val) => setState(() => _selectedQuestion1 = val),
                         ),
                         Gap(1.h),
                         CommonUI.formField(
                           editingController: _securityAnswer1Controller,
-                          hinttext: "Enter Answer 1",
+                          hinttext: "Enter your answer",
                           fillColor: Colors.white,
                           borderColor: AppColors.fieldBorder,
                           borderRadius: 10,
@@ -389,36 +401,16 @@ class _CreateAccountState extends State<CreateAccount> {
                         Gap(2.h),
 
                         _buildFieldLabel("Security Question 2"),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 3.w),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: AppColors.fieldBorder),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              isExpanded: true,
-                              hint: CommonUI().myText(text: "Select Question 2", fontSize: 14.sp, color: AppColors.textGrey),
-                              value: _selectedQuestion2,
-                              items: _questions2.map((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                              onChanged: (newValue) {
-                                setState(() {
-                                  _selectedQuestion2 = newValue;
-                                });
-                              },
-                            ),
-                          ),
+                        _buildSecurityDropdown(
+                          hint: "Select Food Question 2",
+                          value: _selectedQuestion2,
+                          items: _questions2,
+                          onChanged: (val) => setState(() => _selectedQuestion2 = val),
                         ),
                         Gap(1.h),
                         CommonUI.formField(
                           editingController: _securityAnswer2Controller,
-                          hinttext: "Enter Answer 2",
+                          hinttext: "Enter your answer",
                           fillColor: Colors.white,
                           borderColor: AppColors.fieldBorder,
                           borderRadius: 10,
@@ -514,6 +506,50 @@ class _CreateAccountState extends State<CreateAccount> {
         fontSize: 15.sp,
         fontWeight: FontWeight.w700,
         color: AppColors.textBrown.withOpacity(0.9),
+      ),
+    );
+  }
+
+  Widget _buildSecurityDropdown({
+    required String hint,
+    required String? value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 0.5.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.fieldBorder),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          isExpanded: true,
+          hint: CommonUI().myText(
+            text: hint,
+            fontSize: 14.sp,
+            color: AppColors.textGrey,
+            fontWeight: FontWeight.w400,
+          ),
+          value: value,
+          icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.textBrown),
+          dropdownColor: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          items: items.map((String val) {
+            return DropdownMenuItem<String>(
+              value: val,
+              child: CommonUI().myText(
+                text: val,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w400,
+                color: AppColors.black,
+                maxLines: 2,
+              ),
+            );
+          }).toList(),
+          onChanged: onChanged,
+        ),
       ),
     );
   }

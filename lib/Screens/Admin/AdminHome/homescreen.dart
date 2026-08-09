@@ -499,7 +499,6 @@ class _AdminHomeScreenState extends ConsumerState<AdminHomeScreen> {
                 description: _descController.text,
                 photo: selectedImg,
               );
-              print('Payload: ${payload.toJson()}');
               if (_editingFood != null) {
                 ref.read(foodProvider.notifier).updateFoodEvent(_editingFood!.id!, payload, context);
               } else {
