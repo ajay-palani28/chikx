@@ -10,7 +10,7 @@ class ApiMethods {
     required FailureBlock failureBlock,
   }) async {
     var response = await ApiEngine().performRequest(
-      ApiRequestType.POST,
+      ApiRequestType.PUT,
       '${ApiManager().create_account}',
       payload: payload,
       showIndicator: true,
@@ -24,12 +24,30 @@ class ApiMethods {
     required SuccessBlock successBlock,
     required FailureBlock failureBlock,
   }) async {
+    print('Payload: ${payload}');
     var response = await ApiEngine().performRequest(
       ApiRequestType.PUT,
       '${ApiManager().login}',
       payload: payload,
       showIndicator: true,
     );
+    print('Login: ${response.data}');
+    handleResponseCall(response, successBlock, failureBlock);
+    return response;
+  }
+
+  Future googleLogin({
+    required payload,
+    required SuccessBlock successBlock,
+    required FailureBlock failureBlock,
+  }) async {
+    var response = await ApiEngine().performRequest(
+      ApiRequestType.POST,
+      ApiManager().googleLogin,
+      payload: payload,
+      showIndicator: true,
+    );
+    print('Google Login: ${response.data}');
     handleResponseCall(response, successBlock, failureBlock);
     return response;
   }
@@ -46,6 +64,7 @@ class ApiMethods {
       showIndicator: true,
       isWithToken: true
     );
+    print('Add foods: ${response.data}');
     handleResponseCall(response, successBlock, failureBlock);
     return response;
   }
@@ -63,6 +82,7 @@ class ApiMethods {
       showIndicator: true,
       isWithToken: true
     );
+    print('Update foods: ${response.data}');
     handleResponseCall(response, successBlock, failureBlock);
     return response;
   }
@@ -361,6 +381,7 @@ class ApiMethods {
       showIndicator: true,
       isWithToken: true,
     );
+    print('Admin deals: ${response.data}');
     handleResponseCall(response, successBlock, failureBlock);
     return response;
   }
@@ -401,6 +422,25 @@ class ApiMethods {
       FailureBlock failureBlock) {
     switch (response.status) {
       case ApiResponseStatus.SUCCESS:
+        if (response.data is Map) {
+          var rawStatus = response.data['status'];
+          if (rawStatus == false ||
+              rawStatus == 'false' ||
+              rawStatus == 400 ||
+              rawStatus == '400' ||
+              rawStatus == 401 ||
+              rawStatus == '401' ||
+              rawStatus == 403 ||
+              rawStatus == '403' ||
+              rawStatus == 404 ||
+              rawStatus == '404' ||
+              rawStatus == 500 ||
+              rawStatus == '500') {
+            String msg = response.data['message']?.toString() ?? 'An error occurred';
+            failureBlock(Exception(msg), response.data);
+            return;
+          }
+        }
         successBlock(response.data);
         break;
       case ApiResponseStatus.FAILED:
@@ -417,6 +457,7 @@ class ApiManager {
   // static const baseUrl = 'http://10.0.2.2:8787/api';
   String create_account = '$baseUrl/register';
   String login = '$baseUrl/validate-user';
+  String googleLogin = '$baseUrl/auth/google';
   String addFood = '$baseUrl/adminAddFood';
   String adminGetFood = '$baseUrl/adminGetFood';
   String adminUpdateFood = '$baseUrl/adminUpdateFood';

@@ -47,9 +47,13 @@ class CreateAccountNotifier
       payload: payload,
 
       successBlock: (data) {
-
-        state = CreateAccountSuccessSate(data);
-
+        if (data is Map && (data['status'] == false || data['status'] == 'false')) {
+          String msg = data['message']?.toString() ?? 'Account creation failed';
+          state = CreateAccountErrorState(msg);
+          AppAlertController().showAlert(message: msg, inContext: context);
+        } else {
+          state = CreateAccountSuccessSate(data);
+        }
       },
 
       failureBlock: (exception, data) {

@@ -119,9 +119,9 @@ class ApiEngine {
     return apiResponse;
   }
 
-  ApiResponse handleResponse(HTTP.Response response){
+  ApiResponse handleResponse(HTTP.Response response) {
     AppAlertController().hideProgressIndicator();
-    
+
     dynamic data;
     try {
       data = jsonDecode(utf8.decode(response.bodyBytes));
@@ -145,47 +145,58 @@ class ApiEngine {
       return "";
     }
 
-    switch (response.statusCode){
+    bool isDataFailure(dynamic data) {
+      if (data is Map) {
+        var status = data['status'];
+        if (status == false ||
+            status == 'false' ||
+            status == 400 ||
+            status == '400' ||
+            status == 401 ||
+            status == '401' ||
+            status == 403 ||
+            status == '403' ||
+            status == 404 ||
+            status == '404' ||
+            status == 500 ||
+            status == '500') {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    if (response.statusCode >= 400 || isDataFailure(data)) {
+      var status = ApiResponseStatus.FAILED;
+      var message = getMessage(data);
+
+      String path = response.request?.url.path ?? '';
+      bool isAuthEndpoint = path.contains('validate-user') ||
+          path.contains('login') ||
+          path.contains('register');
+
+      if (response.statusCode == 401 && !isAuthEndpoint) {
+        _handleUnauthorized();
+      }
+
+      var exception = Exception(message.isNotEmpty ? message : 'An error occurred');
+      return ApiResponse(status, data, exception: exception);
+    }
+
+    switch (response.statusCode) {
       case 200:
       case 201:
       case 202:
       case 204:
         var status = ApiResponseStatus.SUCCESS;
-        var apiResponse= ApiResponse(status, data);
-        return apiResponse;
-
-      case 401:
-        var status = ApiResponseStatus.FAILED;
-        _handleUnauthorized();
-        var exception = Exception(getMessage(data).isNotEmpty ? getMessage(data) : 'Session expired. Please login again.');
-        var apiResponse = ApiResponse(status, data, exception: exception);
-        return apiResponse;
-
-      case 502:
-      case 504:
-        var status= ApiResponseStatus.FAILED;
-        var message = getMessage(data);
-        var exception= Exception(message.isNotEmpty ? message : 'Server Error');
-        var apiResponse= ApiResponse(status, data, exception: exception);
-        return apiResponse;
-
-      case 500:
-        var status = ApiResponseStatus.FAILED;
-        var exception= Exception('Requested resource was not found on this server');
-        var apiResponse= ApiResponse(status, data, exception: exception);
-        return apiResponse;
-      case 404:
-        var status = ApiResponseStatus.FAILED;
-        var exception =
-        Exception("The requested resource was not found on this server");
-        var apiResponse = ApiResponse(status, data, exception: exception);
+        var apiResponse = ApiResponse(status, data);
         return apiResponse;
 
       default:
-        var status= ApiResponseStatus.FAILED;
+        var status = ApiResponseStatus.FAILED;
         var message = getMessage(data);
-        var exception= Exception(message.isNotEmpty ? message : 'An error occurred');
-        var apiResponse= ApiResponse(status, data, exception: exception);
+        var exception = Exception(message.isNotEmpty ? message : 'An error occurred');
+        var apiResponse = ApiResponse(status, data, exception: exception);
         return apiResponse;
     }
   }

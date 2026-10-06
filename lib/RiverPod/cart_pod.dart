@@ -1,5 +1,6 @@
 import 'package:chikx/Models/app_model.dart';
 import 'package:chikx/Network/api_manager.dart';
+import 'package:chikx/Utils/app_alerController.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -31,7 +32,12 @@ class CartNotifier extends StateNotifier<List<CartItem>> {
           print("Error parsing cart: $e");
         }
       },
-      failureBlock: (exception, data) {},
+      failureBlock: (exception, data) {
+        AppAlertController().showAlert(
+          message: exception.toString(),
+          inContext: context,
+        );
+      },
     );
   }
 
@@ -45,7 +51,12 @@ class CartNotifier extends StateNotifier<List<CartItem>> {
       successBlock: (data) {
         getCart(userId, context);
       },
-      failureBlock: (exception, data) {},
+      failureBlock: (exception, data) {
+        AppAlertController().showAlert(
+          message: exception.toString(),
+          inContext: context,
+        );
+      },
     );
   }
 
@@ -56,7 +67,12 @@ class CartNotifier extends StateNotifier<List<CartItem>> {
       successBlock: (data) {
         getCart(userId, context);
       },
-      failureBlock: (exception, data) {},
+      failureBlock: (exception, data) {
+        AppAlertController().showAlert(
+          message: exception.toString(),
+          inContext: context,
+        );
+      },
     );
   }
 

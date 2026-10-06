@@ -1,5 +1,6 @@
 import 'package:chikx/Models/app_model.dart';
 import 'package:chikx/Network/api_manager.dart';
+import 'package:chikx/Utils/app_alerController.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -41,7 +42,7 @@ class AdminUsersNotifier extends StateNotifier<AdminUsersState> {
 
   List<UserModel> _allUsers = [];
 
-  Future<void> fetchUsers() async {
+  Future<void> fetchUsers({BuildContext? context}) async {
     state = AdminUsersLoadingState();
     await ApiMethods().getAdminUsers(
       successBlock: (data) {
@@ -57,6 +58,12 @@ class AdminUsersNotifier extends StateNotifier<AdminUsersState> {
       },
       failureBlock: (exception, data) {
         state = AdminUsersErrorState(exception.toString());
+        if (context != null) {
+          AppAlertController().showAlert(
+            message: exception.toString(),
+            inContext: context,
+          );
+        }
       },
     );
   }
@@ -95,8 +102,9 @@ class AdminUsersNotifier extends StateNotifier<AdminUsersState> {
       },
       failureBlock: (exception, data) {
         state = AdminUsersDeleteErrorState(previousUsers, exception.toString());
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to delete user: ${exception.toString()}")),
+        AppAlertController().showAlert(
+          message: exception.toString(),
+          inContext: context,
         );
         // Revert to success state with previous list after error
         state = AdminUsersSuccessState(previousUsers);

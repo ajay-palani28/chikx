@@ -105,6 +105,10 @@ class FoodNotifier extends StateNotifier<FoodState> {
       },
       failureBlock: (exception, data) {
         state = GetFoodErrorState(exception.toString());
+        AppAlertController().showAlert(
+          message: exception.toString(),
+          inContext: context,
+        );
       },
     );
   }

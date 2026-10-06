@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "726578256225",
+    "project_id": "chikx-3ee0d",
+    "storage_bucket": "chikx-3ee0d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:726578256225:android:02a0aca21ee9b139a70d20",
+        "android_client_info": {
+          "package_name": "com.chikx.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "726578256225-b21r8guj97kh9df64cabcn1i3kai3lt0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chikx.app",
+            "certificate_hash": "4f4537aa9fc84d8a25538ec7c813976242b00acf"
+          }
+        },
+        {
+          "client_id": "726578256225-0eu9r6ukeejq19dvh3mu7kd5bipnp77b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfn1HPhxyFbXJIL0OOtQCAbvLNDwf34no"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "726578256225-0eu9r6ukeejq19dvh3mu7kd5bipnp77b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

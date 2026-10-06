@@ -7,7 +7,7 @@ import 'appdata_helper.dart';
 import 'commonui.dart';
 
 class AppAlertController {
-  var _isLoaderShowing = false;
+  bool _isLoaderShowing = false;
   static final AppAlertController _inst = AppAlertController._internal();
 
   AppAlertController._internal();
@@ -22,7 +22,7 @@ class AppAlertController {
     _indicatorContext = inContext ?? AppDataHelper.rootContext;
     return showGeneralDialog<void>(
         barrierDismissible: false,
-        transitionDuration: Duration(milliseconds: 300),
+        transitionDuration: const Duration(milliseconds: 200),
         barrierColor: Colors.black54,
         context: inContext ?? AppDataHelper.rootContext!,
         pageBuilder: (context, animation, secondaryAnimation) {
@@ -48,18 +48,16 @@ class AppAlertController {
     var loadWithBG = Container(
       width: loaderSize * 2,
       height: loaderSize * 2,
-      child: Center(
-        child: loader,
-      ),
       decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: Colors.white),
-          borderRadius: BorderRadius.all(Radius.circular(20))),
-    );
-    return Container(
+          borderRadius: const BorderRadius.all(Radius.circular(20))),
       child: Center(
-        child: loadWithBG,
+        child: loader,
       ),
+    );
+    return Center(
+      child: loadWithBG,
     );
   }
 
@@ -74,8 +72,17 @@ class AppAlertController {
 
   void hideProgressIndicator() {
     if (!_isLoaderShowing) return;
-    Navigator.pop(_indicatorContext!);
     _isLoaderShowing = false;
+    final ctx = _indicatorContext ?? AppDataHelper.rootContext;
+    if (ctx != null) {
+      try {
+        if (Navigator.of(ctx, rootNavigator: true).canPop()) {
+          Navigator.of(ctx, rootNavigator: true).pop();
+        }
+      } catch (e) {
+        debugPrint("Error hiding progress indicator: $e");
+      }
+    }
   }
 
   void showAlert({
@@ -83,138 +90,138 @@ class AppAlertController {
     required String message,
     String? cancelTitle,
     String? otherTitle,
-    bool isOkButtonShown=true,
+    bool isOkButtonShown = true,
     VoidCallback? otherAction,
     VoidCallback? cancelAction,
     required BuildContext? inContext,
-  }) async {
-    int tabControl=0;
+  }) {
     hideProgressIndicator();
 
-    final BuildContext context =
-        inContext ?? AppDataHelper.rootContext!;
+    final BuildContext? targetContext =
+        inContext ?? AppDataHelper.rootContext;
 
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: false,
-      barrierColor: AppColors.bgColor.withOpacity(0.5),
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return Center(
-          child: Material(
-            elevation: 0.2,
-            color: AppColors.white,
+    if (targetContext == null) return;
 
-            borderRadius: BorderRadius.circular(5),
-            child: Container(
-              width: 90.w,
-              padding: EdgeInsets.all(4.w),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                border: Border.all(color: AppColors.primary.withOpacity(0.3)),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CommonUI().myText(
-                        text: title,
-                        fontSize: 15.sp,
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      Spacer(),
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Icon(
-                          Icons.close,
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (!targetContext.mounted) return;
+
+      String displayMessage = message.replaceFirst(RegExp(r'^Exception:\s*'), '');
+
+      showGeneralDialog(
+        context: targetContext,
+        barrierDismissible: false,
+        barrierColor: AppColors.bgColor.withOpacity(0.5),
+        transitionDuration: const Duration(milliseconds: 200),
+        pageBuilder: (dialogContext, animation, secondaryAnimation) {
+          return Center(
+            child: Material(
+              elevation: 0.2,
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(5),
+              child: Container(
+                width: 90.w,
+                padding: EdgeInsets.all(4.w),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CommonUI().myText(
+                          text: title,
+                          fontSize: 15.sp,
                           color: AppColors.primary,
+                          fontWeight: FontWeight.w500,
                         ),
-                      ),
-                    ],
-                  ),
-
-                  Divider(color: AppColors.primaryLight, thickness: 0.1,),
-                  Gap(2.h),
-                  SizedBox(
-                    // height: 3.h,
-                    // height: 12.h,
-                    child: SingleChildScrollView(
-                      child: Center(
-                        child: CommonUI().myText(
-                          text: message.startsWith('Exception:')
-                              ? message.split('Exception:')[1]
-                              : message,
-                          textAlign: TextAlign.center,
-                          fontSize: 14.5.sp,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textGrey,
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: () => Navigator.of(dialogContext, rootNavigator: true).pop(),
+                          child: const Icon(
+                            Icons.close,
+                            color: AppColors.primary,
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ),
 
-                  Gap(2.h),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      CommonUI.buildButton(
-                        width: 18.w,
-                        height: 4.h,
-                        borderradius: 5,
-                        // color: AppColors.white,
-                        gradientfirst: AppColors.primary,
-                        gradientsecond: AppColors.primary,
-                        bordercolor: AppColors.white,
-                        onPressed: () {
-                          Navigator.of(context, rootNavigator: true).pop();
-                          if (cancelAction != null) {
-                            cancelAction();
-                          }
-                        },
-                        file: Center(
+                    const Divider(color: AppColors.primaryLight, thickness: 0.1),
+                    Gap(2.h),
+                    SizedBox(
+                      child: SingleChildScrollView(
+                        child: Center(
                           child: CommonUI().myText(
-                            text: cancelTitle ?? 'Ok',
-                            color: AppColors.white,
+                            text: displayMessage,
+                            textAlign: TextAlign.center,
+                            fontSize: 14.5.sp,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textGrey,
                           ),
                         ),
                       ),
+                    ),
 
-                      if (otherTitle != null) ...[
-                        Gap(2.w),
-
+                    Gap(2.h),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
                         CommonUI.buildButton(
                           width: 18.w,
                           height: 4.h,
                           borderradius: 5,
+                          gradientfirst: AppColors.primary,
+                          gradientsecond: AppColors.primary,
+                          bordercolor: AppColors.white,
                           onPressed: () {
-                            Navigator.of(context, rootNavigator: true).pop();
-                            if (otherAction != null) {
-                              otherAction();
+                            Navigator.of(dialogContext, rootNavigator: true).pop();
+                            if (cancelAction != null) {
+                              cancelAction();
                             }
                           },
                           file: Center(
                             child: CommonUI().myText(
-                              text: otherTitle,
-                              color: AppColors.primary,
+                              text: cancelTitle ?? 'Ok',
+                              color: AppColors.white,
                             ),
                           ),
                         ),
+
+                        if (otherTitle != null) ...[
+                          Gap(2.w),
+                          CommonUI.buildButton(
+                            width: 18.w,
+                            height: 4.h,
+                            borderradius: 5,
+                            onPressed: () {
+                              Navigator.of(dialogContext, rootNavigator: true).pop();
+                              if (otherAction != null) {
+                                otherAction();
+                              }
+                            },
+                            file: Center(
+                              child: CommonUI().myText(
+                                text: otherTitle,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
-                  ),
-                  Gap(1.5.h),
-                ],
+                    ),
+                    Gap(1.5.h),
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      },
-    );
+          );
+        },
+      );
+    });
   }
 }

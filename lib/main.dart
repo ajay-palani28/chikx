@@ -8,6 +8,8 @@ import 'Screens/splashscreen.dart';
 import 'Utils/app_colors.dart';
 import 'Utils/appdata_helper.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+
 MaterialColor buildMaterialColor(Color color) {
   List strengths = <double>[.05];
   Map<int, Color> swatch = {};
@@ -29,6 +31,11 @@ MaterialColor buildMaterialColor(Color color) {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    debugPrint("Firebase initialization error: $e");
+  }
   runApp(const ProviderScope(child: MyApp()));
 }
 

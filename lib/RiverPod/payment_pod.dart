@@ -1,5 +1,6 @@
 import 'package:chikx/Models/app_model.dart';
 import 'package:chikx/Network/api_manager.dart';
+import 'package:chikx/Utils/app_alerController.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
@@ -36,6 +37,10 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
       },
       failureBlock: (exception, data) {
         state = PaymentErrorState(exception.toString());
+        AppAlertController().showAlert(
+          message: exception.toString(),
+          inContext: context,
+        );
       },
     );
   }

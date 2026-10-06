@@ -5,6 +5,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../Network/api_manager.dart';
 import '../Screens/UpdateAndMaintenance/maintenance_screen.dart';
 import '../Screens/UpdateAndMaintenance/update_screen.dart';
+import '../Utils/app_alerController.dart';
 
 class AppConfigState {
   final bool isLoading;
@@ -74,6 +75,10 @@ class AppConfigNotifier extends StateNotifier<AppConfigState> {
       },
       failureBlock: (exception, data) {
         state = state.copyWith(isLoading: false, error: exception.toString());
+        AppAlertController().showAlert(
+          message: exception.toString(),
+          inContext: context,
+        );
       },
     );
   }

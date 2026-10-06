@@ -459,6 +459,37 @@ class _CreateAccountState extends State<CreateAccount> {
                               );
                             }
                         ),
+                        Gap(2.h),
+                        OutlinedButton(
+                          onPressed: () {
+                            ref.read(loginProvider.notifier).loginWithGoogle(context);
+                          },
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: Size(100.w, 5.h),
+                            side: const BorderSide(color: AppColors.fieldBorder),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            backgroundColor: Colors.white,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.g_mobiledata,
+                                size: 28,
+                                color: AppColors.primary,
+                              ),
+                              Gap(2.w),
+                              CommonUI().myText(
+                                text: "Continue with Google",
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.black,
+                              ),
+                            ],
+                          ),
+                        ),
                         Gap(3.h),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,

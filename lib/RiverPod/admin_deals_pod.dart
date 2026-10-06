@@ -1,5 +1,6 @@
 import 'package:chikx/Models/app_model.dart';
 import 'package:chikx/Network/api_manager.dart';
+import 'package:chikx/Utils/app_alerController.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -31,7 +32,7 @@ class AdminDealsNotifier extends StateNotifier<AdminDealsState> {
 
   List<AdminDealModel> _allDeals = [];
 
-  Future<void> fetchDeals({String? status}) async {
+  Future<void> fetchDeals({String? status, BuildContext? context}) async {
     state = AdminDealsLoadingState();
     await ApiMethods().getDeals(
       status: status,
@@ -56,6 +57,12 @@ class AdminDealsNotifier extends StateNotifier<AdminDealsState> {
       },
       failureBlock: (exception, data) {
         state = AdminDealsErrorState(exception.toString());
+        if (context != null) {
+          AppAlertController().showAlert(
+            message: exception.toString(),
+            inContext: context,
+          );
+        }
       },
     );
   }
@@ -69,15 +76,16 @@ class AdminDealsNotifier extends StateNotifier<AdminDealsState> {
       dealId: dealId,
       payload: deal.toJson(),
       successBlock: (data) {
-        fetchDeals();
+        fetchDeals(context: context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(deal.id == null ? "Deal created successfully" : "Deal updated successfully")),
         );
       },
       failureBlock: (exception, data) {
         state = AdminDealsSuccessState(previousDeals);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to save deal: ${exception.toString()}")),
+        AppAlertController().showAlert(
+          message: exception.toString(),
+          inContext: context,
         );
       },
     );
@@ -98,8 +106,9 @@ class AdminDealsNotifier extends StateNotifier<AdminDealsState> {
       },
       failureBlock: (exception, data) {
         state = AdminDealsSuccessState(previousDeals);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to delete deal: ${exception.toString()}")),
+        AppAlertController().showAlert(
+          message: exception.toString(),
+          inContext: context,
         );
       },
     );

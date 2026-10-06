@@ -53,6 +53,7 @@ class FavoriteNotifier extends StateNotifier<FavoriteState> {
       },
       failureBlock: (exception, data) {
         state = GetFavoriteErrorState(exception.toString());
+        AppAlertController().showAlert(message: exception.toString(), inContext: context);
       },
     );
   }

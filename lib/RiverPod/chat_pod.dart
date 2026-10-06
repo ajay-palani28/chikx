@@ -48,6 +48,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
       },
       failureBlock: (exception, data) {
         state = ChatErrorState(exception.toString());
+        AppAlertController().showAlert(message: exception.toString(), inContext: context);
       },
     );
   }
@@ -85,6 +86,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
       },
       failureBlock: (exception, data) {
         state = ChatErrorState(exception.toString());
+        AppAlertController().showAlert(message: exception.toString(), inContext: context);
       },
     );
   }
@@ -117,6 +119,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
       },
       failureBlock: (exception, data) {
         state = ChatErrorState(exception.toString());
+        AppAlertController().showAlert(message: exception.toString(), inContext: context);
       },
     );
   }

@@ -1,26 +1,26 @@
 class CreateAccountModel {
-  String fullName;
-  String dob;
-  String phone;
-  String email;
-  String password;
-  String cpassword;
-  String securityQuestion1;
-  String securityAnswer1;
-  String securityQuestion2;
-  String securityAnswer2;
+  String? fullName;
+  String? dob;
+  String? phone;
+  String? email;
+  String? password;
+  String? cpassword;
+  String? securityQuestion1;
+  String? securityAnswer1;
+  String? securityQuestion2;
+  String? securityAnswer2;
 
   CreateAccountModel({
-    required this.fullName,
-    required this.dob,
-    required this.phone,
-    required this.email,
-    required this.password,
-    required this.cpassword,
-    required this.securityQuestion1,
-    required this.securityAnswer1,
-    required this.securityQuestion2,
-    required this.securityAnswer2,
+     this.fullName,
+     this.dob,
+     this.phone,
+     this.email,
+     this.password,
+     this.cpassword,
+     this.securityQuestion1,
+     this.securityAnswer1,
+     this.securityQuestion2,
+     this.securityAnswer2,
   });
 
   Map<String, dynamic> toJson() => {
@@ -46,11 +46,72 @@ class LoginModel {
     required this.password,
   });
 
-
   Map<String, dynamic> toJson() => {
     "phone": phone,
     "password": password,
   };
+}
+
+class LoginDataModel {
+  String? id;
+  String? token;
+  bool? admin;
+  String? phone;
+  String? emailId;
+  bool? isEmail;
+  bool? validated;
+
+  LoginDataModel({
+    this.id,
+    this.token,
+    this.admin,
+    this.phone,
+    this.emailId,
+    this.isEmail,
+    this.validated,
+  });
+
+  factory LoginDataModel.fromJson(Map<String, dynamic> json) => LoginDataModel(
+    id: json["id"]?.toString() ?? json["_id"]?.toString(),
+    token: json["token"]?.toString(),
+    admin: json["admin"] ?? false,
+    phone: json["phone"]?.toString(),
+    emailId: json["emailId"]?.toString() ?? json["email"]?.toString(),
+    isEmail: json["isEmail"] == true,
+    validated: json["validated"] == true,
+  );
+}
+
+class LoginResponseModel {
+  bool status;
+  String message;
+  LoginDataModel? data;
+
+  LoginResponseModel({
+    required this.status,
+    required this.message,
+    this.data,
+  });
+
+  factory LoginResponseModel.fromJson(Map<String, dynamic> json) {
+    var rawStatus = json["status"];
+    bool isSuccess = rawStatus == true ||
+        rawStatus == 'true' ||
+        rawStatus == 200 ||
+        rawStatus == '200' ||
+        rawStatus == 201 ||
+        rawStatus == '201' ||
+        rawStatus == 202 ||
+        rawStatus == 204;
+
+    return LoginResponseModel(
+      status: isSuccess,
+      message: json["message"]?.toString() ?? "",
+      data: json["data"] != null && json["data"] is Map
+          ? LoginDataModel.fromJson(Map<String, dynamic>.from(json["data"]))
+          : null,
+    );
+  }
 }
 
 class AddFoodModel {

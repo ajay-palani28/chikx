@@ -70,19 +70,29 @@ class _LoginState extends ConsumerState<Login> {
   @override
   Widget build(BuildContext context) {
     ref.listen(loginProvider, (previous, next) {
-      if(next is LoginSuccessSate){
-        var state = next.data['data'];
-        setToken(state['token']);
-        setUserId(state['id']);
-        setIsAdmin(state['admin']);
-        if(state['admin']){
-          Navigator.push(context, MaterialPageRoute(builder: (context) => Admindashboard(),));
-        }
-        else{
-          Navigator.push(context, MaterialPageRoute(builder: (context) => Dashboard(),));
+      print('Next: ${next}');
+      if (next is LoginSuccessSate) {
+        final loginData = next.response.data;
+        if (loginData != null && loginData.token != null) {
+          setToken(loginData.token!);
+          setUserId(loginData.id ?? '');
+          bool isAdmin = loginData.admin ?? false;
+          setIsAdmin(isAdmin);
+          print('Responsed login: ${loginData}');
+          if (isAdmin) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Admindashboard()),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Dashboard()),
+            );
+          }
         }
       }
-    },);
+    });
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -268,7 +278,40 @@ class _LoginState extends ConsumerState<Login> {
                     ),
                   ),
                 ),
-                Gap(5.h),
+                Gap(2.h),
+
+                // Google Sign In Button
+                OutlinedButton(
+                  onPressed: () {
+                    ref.read(loginProvider.notifier).loginWithGoogle(context);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: Size(100.w, 5.h),
+                    side: const BorderSide(color: AppColors.fieldBorder),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    backgroundColor: Colors.white,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.g_mobiledata,
+                        size: 28,
+                        color: AppColors.primary,
+                      ),
+                      Gap(2.w),
+                      CommonUI().myText(
+                        text: "Continue with Google",
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.black,
+                      ),
+                    ],
+                  ),
+                ),
+                Gap(3.h),
 
                 // Create Account Link
                 Row(
